@@ -1,0 +1,39 @@
+.faq-sect {
+    padding: 60px 0;
+}
+
+.faq-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.faq-card:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+}
+
+.faq-question {
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.faq-answer {
+    margin-top: 10px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.faq-card.active .faq-question span:last-child {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.text-orange {
+    color: #f15a29;
+}
