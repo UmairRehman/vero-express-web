@@ -17,8 +17,7 @@ Api.interceptors.request.use(
         config.headers["access-key"] = process.env.REACT_APP_ACCESS_KEY;
         config.headers["language"] = localStorage.getItem("i18nextLng") || "en";
 
-        config.headers["authorization"] =
-            `Bearer ${localStorage.getItem("accessToken")}`;
+        config.headers["authorization"] = localStorage.getItem("api_key");
 
         return config;
     },
@@ -58,7 +57,7 @@ Api.interceptors.response.use(
             console.log(message);
         }
         res.data = { ...res?.data, success: false };
-            console.log(res?.status,"Unauthorized access, redirecting to login");
+        console.log(res?.status, "Unauthorized access, redirecting to login");
 
         if (res?.status === 401 && !window.location.href.includes("auth")) {
             notification.destroy();
