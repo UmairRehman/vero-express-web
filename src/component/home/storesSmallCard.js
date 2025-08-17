@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { getStores } from '../../services/stores';
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { setSelectedStore } from '../../redux/feature/stores';
+
 
 function StoresSmallCard() {
     const [stores, setStores] = useState([]);
     const navigate = useNavigate();
-
+    const dispatch = useDispatch();
     useEffect(() => {
         fetchStores();
     }, []);
@@ -30,7 +33,16 @@ function StoresSmallCard() {
             <div className="row">
                 {!!displayStores.length && displayStores.map((store, index) => (
                     <div className="col-md-4" key={store._id || index}>
-                        <div className="ts-item">
+                        <div
+                            className="ts-item"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => {
+                                navigate(
+                                    `/item-purchase/shop?store_name=${encodeURIComponent(store.store_name || store.display_name)}`
+                                );
+                                dispatch(setSelectedStore(store));
+                            }}
+                        >
                             <img
                                 src={store.store_logo || store.store_logo_white || ''}
                                 alt={store.display_name || store.store_name}

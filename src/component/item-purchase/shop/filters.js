@@ -12,23 +12,23 @@ const filtersData = {
 export default function SidebarFilter() {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const [selectedOffers, setSelectedOffers] = useState([]);
-    const [selectedPrice, setSelectedPrice] = useState([]);
+    const [selectedOffer, setSelectedOffer] = useState("");
+    const [selectedPrice, setSelectedPrice] = useState("");
     const [customPrice, setCustomPrice] = useState({ low: "", high: "" });
-    const [selectedColors, setSelectedColors] = useState([]);
-    const [selectedLocation, setSelectedLocation] = useState([]);
+    const [selectedColor, setSelectedColor] = useState("");
+    const [selectedLocation, setSelectedLocation] = useState("");
     const [shipTo, setShipTo] = useState("");
 
     // Load from query params
     useEffect(() => {
-        setSelectedOffers(searchParams.getAll("offer"));
-        setSelectedPrice(searchParams.getAll("price"));
+        setSelectedOffer(searchParams.get("offer") || "");
+        setSelectedPrice(searchParams.get("price") || "");
         setCustomPrice({
             low: searchParams.get("low") || "",
             high: searchParams.get("high") || "",
         });
-        setSelectedColors(searchParams.getAll("color"));
-        setSelectedLocation(searchParams.getAll("location"));
+        setSelectedColor(searchParams.get("color") || "");
+        setSelectedLocation(searchParams.get("location") || "");
         setShipTo(searchParams.get("shipto") || "");
     }, []);
 
@@ -36,41 +36,37 @@ export default function SidebarFilter() {
     useEffect(() => {
         console.log("Filters changed, make API call...");
         // you can call your API here
-    }, [selectedOffers, selectedPrice, customPrice, selectedColors, selectedLocation, shipTo]);
+    }, [selectedOffer, selectedPrice, customPrice, selectedColor, selectedLocation, shipTo]);
 
     // Update query params
     const updateParams = () => {
         const params = new URLSearchParams();
-        selectedOffers.forEach((offer) => params.append("offer", offer));
-        selectedPrice.forEach((p) => params.append("price", p));
+        params.set("store_name", searchParams.get("store_name") || "");
+        if (selectedOffer) params.set("offer", selectedOffer);
+        if (selectedPrice) params.set("price", selectedPrice);
         if (customPrice.low) params.set("low", customPrice.low);
         if (customPrice.high) params.set("high", customPrice.high);
-        selectedColors.forEach((c) => params.append("color", c));
-        selectedLocation.forEach((l) => params.append("location", l));
+        if (selectedColor) params.set("color", selectedColor);
+        if (selectedLocation) params.set("location", selectedLocation);
         if (shipTo) params.set("shipto", shipTo);
-        setSearchParams(params);
-    };
-
-    const handleCheckbox = (value, setFn, list) => {
-        const updated = list.includes(value)
-            ? list.filter((v) => v !== value)
-            : [...list, value];
-        setFn(updated);
+        setSearchParams(params);    
     };
 
     const resetAll = () => {
-        setSelectedOffers([]);
-        setSelectedPrice([]);
+        setSelectedOffer("");
+        setSelectedPrice("");
         setCustomPrice({ low: "", high: "" });
-        setSelectedColors([]);
-        setSelectedLocation([]);
+        setSelectedColor("");
+        setSelectedLocation("");
         setShipTo("");
         setSearchParams({});
+        console.log("Updating query params...");
     };
 
     useEffect(() => {
         updateParams();
-    }, [selectedOffers, selectedPrice, customPrice, selectedColors, selectedLocation, shipTo]);
+        console.log("Updating query params...");
+    }, [selectedOffer, selectedPrice, customPrice, selectedColor, selectedLocation, shipTo]);
 
     return (
         <div className="col-md-3">
@@ -84,11 +80,10 @@ export default function SidebarFilter() {
                             <li key={offer}>
                                 <label>
                                     <input
-                                        type="checkbox"
-                                        checked={selectedOffers.includes(offer)}
-                                        onChange={() =>
-                                            handleCheckbox(offer, setSelectedOffers, selectedOffers)
-                                        }
+                                        type="radio"
+                                        name="offer"
+                                        checked={selectedOffer === offer}
+                                        onChange={() => setSelectedOffer(offer)}
                                     />{" "}
                                     {offer}
                                 </label>
@@ -104,11 +99,10 @@ export default function SidebarFilter() {
                             <li key={p}>
                                 <label>
                                     <input
-                                        type="checkbox"
-                                        checked={selectedPrice.includes(p)}
-                                        onChange={() =>
-                                            handleCheckbox(p, setSelectedPrice, selectedPrice)
-                                        }
+                                        type="radio"
+                                        name="price"
+                                        checked={selectedPrice === p}
+                                        onChange={() => setSelectedPrice(p)}
                                     />{" "}
                                     {p.replace("Under ", "Under USD ").replace("50to100", "USD 50 to 100")}
                                 </label>
@@ -147,11 +141,10 @@ export default function SidebarFilter() {
                             <li key={color}>
                                 <label>
                                     <input
-                                        type="checkbox"
-                                        checked={selectedColors.includes(color)}
-                                        onChange={() =>
-                                            handleCheckbox(color, setSelectedColors, selectedColors)
-                                        }
+                                        type="radio"
+                                        name="color"
+                                        checked={selectedColor === color}
+                                        onChange={() => setSelectedColor(color)}
                                     />{" "}
                                     {color}
                                 </label>
@@ -167,11 +160,10 @@ export default function SidebarFilter() {
                             <li key={loc}>
                                 <label>
                                     <input
-                                        type="checkbox"
-                                        checked={selectedLocation.includes(loc)}
-                                        onChange={() =>
-                                            handleCheckbox(loc, setSelectedLocation, selectedLocation)
-                                        }
+                                        type="radio"
+                                        name="location"
+                                        checked={selectedLocation === loc}
+                                        onChange={() => setSelectedLocation(loc)}
                                     />{" "}
                                     {loc}
                                 </label>
