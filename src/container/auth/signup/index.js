@@ -9,6 +9,7 @@ import Success from "../../../assets/images/success.gif"
 import PersonalDetails from "../../../component/purchase/auth/signup/personalDetails";
 import Address from "../../../component/purchase/auth/signup/address";
 import { Form, message } from 'antd';
+import { register } from '../../../services/auth';
 
 const FormSection = () => {
     const [form1] = Form.useForm();
@@ -30,11 +31,34 @@ const FormSection = () => {
             try {
                 const values = await form2.validateFields();
                 setAddressData(values);
-                setActiveTab(tabId);
-                // Console all data on step 2 submit
-                console.log({ ...personalData, ...values });
-            } catch {
-                message.error("Please complete all required fields in Address.");
+                // Merge all data for registration
+                const payload = {
+                    first_name: personalData.firstName,
+                    last_name: personalData.lastName,
+                    email: personalData.email,
+                    password: personalData.password,
+                    mobile_number: personalData.phone,
+                    gender: personalData.gender,
+                    zip: values.zip,
+                    city: values.city,
+                    state: values.state,
+                    country: values.country,
+                    street_address: values.address,
+                    user_type: 'user',
+                };
+                // Call register API
+                const { data: res } = await register(payload);
+                if (res.success) {
+                    setActiveTab(tabId);
+                } else {
+                    message.error(res?.meta?.message || res?.message || 'Registration failed.');
+                }
+            } catch (err) {
+                if (err?.errorFields) {
+                    message.error("Please complete all required fields in Address.");
+                } else {
+                    message.error(err?.response?.data?.meta?.message || err?.response?.data?.message || 'Registration failed.');
+                }
             }
         } else {
             setActiveTab(tabId);

@@ -8,6 +8,7 @@ const PhoneLogin = () => {
     const navigate = useNavigate();
     const [phone, setPhone] = useState("");
     const [touched, setTouched] = useState(false);
+    const [loader, setLoader] = useNavigate(false)
 
     const isValidPhone = (num) => {
         const digits = num.replace(/\D/g, "");
@@ -19,15 +20,17 @@ const PhoneLogin = () => {
         setTouched(true);
         if (isValidPhone(phone)) {
             try {
+                setLoader(true)
                 const { data: res } = await createOtp({ phoneNo: phone });
                 console.log(res.success, "res   from createOtp");
                 if (res.success) {
                     navigate("/otp", { state: { phone } });
-                    // setPayments(data)
-                    // dispatch(AddPayment(data));
                 }
             } catch (error) {
                 console.log(error);
+            }
+            finally {
+                setLoader(false);
             }
         }
     };

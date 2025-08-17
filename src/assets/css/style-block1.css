@@ -46,11 +46,11 @@ header .col-md-12 {display: flex;justify-content: space-between;align-items: cen
 
 .hd-right ul {display: flex;justify-content: end;}
 
-.hd-center {    width: 62%;    padding-right: 15px;   }
+.hd-center {    width: 55%;    padding-right: 15px;   }
 
 .hd-left {width: 15%;padding-right: 15px;display: flex;align-items: center;}
 
-.hd-right {    width: 22%;    padding-left: 15px;}
+.hd-right {    width: 29%;    padding-left: 15px;}
 
 .hd-right ul li a {    margin-right: 0;   }
 

@@ -21,7 +21,7 @@ function ItemExplore() {
             <ShopBanner />
             <section class="dep-service" >
                 <div class="container">
-                    <Departments />
+                    {/* <Departments /> */}
                     <TopStores />
                 </div>
             </section>

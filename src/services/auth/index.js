@@ -11,3 +11,7 @@ export const verifyOtp = async (data) => {
 export const resendOtp = async (data) => {
     return Api.post(`/auth/resend-code`, data);
 };
+
+export const register = async (data) => {
+    return Api.post(`/auth/register`, data);
+};
