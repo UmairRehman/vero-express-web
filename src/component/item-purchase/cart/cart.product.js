@@ -1,8 +1,18 @@
+import { useState } from "react";
+import DefaultImage from '../../../assets/images/default-image.webp';
+
 const CartItem = ({ item, onQtyChange, onDelete }) => {
+    const [imgError, setImgError] = useState(false);
+    const productImage =
+        item && item.image ? item.image : null;
     return (
         <div className="cart-prod-item">
             <div className="cart-thumb">
-                <a href="#"><img className="prod_img" src={item.image} alt="" /></a>
+                {productImage && !imgError ? (
+                    <a><img className="prod_img" src={productImage} alt={item.title} onError={() => setImgError(true)} /></a>
+                ) : (
+                    <a><img className="prod_img" src={DefaultImage} alt={item.title} /></a>
+                )}
             </div>
             <div className="cart-text">
                 <a className="cart_cat" href="#"><span>{item.category}</span></a>
@@ -21,8 +31,8 @@ const CartItem = ({ item, onQtyChange, onDelete }) => {
                         <button onClick={() => onQtyChange(item.id, 1)} className="qty-count qty-count--add">+</button>
                     </div>
                     <div className="cart_sv_de">
-                        <a className="cart_save"><i className="fa fa-heart"></i> Save</a>
-                        <a className="cart_del" onClick={() => onDelete(item.id)}><i className="fa fa-trash"></i> Delete</a>
+                        <a style={{ cursor: "pointer" }} className="cart_save"><i className="fa fa-heart"></i> Save</a>
+                        <a style={{ cursor: "pointer" }} className="cart_del cursor-pointer" onClick={() => onDelete(item.id)}><i className="fa fa-trash"></i> Delete</a>
                     </div>
                 </div>
             </div>

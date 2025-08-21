@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TempImage from '../../../assets/images/prod3.jpg'
 import Slider from "react-slick";
+import { searchStoreProducts } from "../../../services/stores";
+import { getAllStoreDetails } from "../../../redux/feature/stores";
+import { useSelector } from "react-redux";
 const bestSellers = [
     {
         id: 2,
@@ -48,6 +51,7 @@ const bestSellers = [
     },
 ];
 function BestSeller() {
+    const selectedStore = useSelector(getAllStoreDetails) || [];
     const settings = {
         dots: false,
         infinite: true,
@@ -56,6 +60,36 @@ function BestSeller() {
         slidesToScroll: 1,
         arrows: true,
     };
+
+
+    const [products, setProducts] = useState([]);
+
+    const fetchProducts = async () => {
+        if (selectedStore.length > 0) {
+            try {
+                const res = await searchStoreProducts(
+                    {
+                        store_name: selectedStore[0].store_name,
+                        per_page: 4,
+                        page: 1,
+                    }
+                );
+                if (res?.data?.data.data) {
+                    setProducts(res.data.data.data);
+                } else {
+                    setProducts([]);
+                }
+            } catch {
+                setProducts([]);
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+
     return (
         <>
             <section className="best-seller">

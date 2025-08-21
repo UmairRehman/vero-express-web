@@ -117,6 +117,17 @@ header {
     color: #2FB652;
 }
 
+
+.btn.btn-lgreen:hover {
+    /* background: lch(65.5 66.18 143.27 / 0.1);
+    border-color: lch(65.5 66.18 143.27 / 0.1);
+    color: #2FB652; */
+    background: lch(65.5 66.18 143.27 / 0.1);
+    border-color: lch(65.5 66.18 143.27 / 0.1);
+    color: #2FB652;
+
+}
+
 .btn.btn-blue {
     background: #00CFE8;
     border-color: #00CFE8;

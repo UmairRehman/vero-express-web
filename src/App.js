@@ -1,9 +1,11 @@
 import './App.css';
 import './assets/css/style-block1.css';
 import './assets/css/custom-styling.css';
+import './assets/css/wallet.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'antd/dist/reset.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Home from './container/itemPurchase/home';
 import SignupPage from './container/auth/signup';
 import PhoneLogin from './container/auth/login/phoneLogin';
@@ -26,11 +28,45 @@ import Booking from './container/dashboard/booking';
 import BookingDetails from './container/dashboard/booking/booking-details';
 import Profile from './container/dashboard/profile';
 import Support from './container/dashboard/support';
+import { useEffect, useState } from 'react';
+import { getStores } from './services/stores';
+import { message } from 'antd';
+import { useDispatch } from 'react-redux';
+import { setAllStores } from './redux/feature/stores';
+
+// ScrollToTop component moved outside App component
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 function App() {
+  const [stores, setStores] = useState([]);
+  const dispatch = useDispatch();
+
+  const fetchStores = async () => {
+    try {
+      const response = await getStores({ per_page: 12, page: 1 });
+      if (response.data && response.data.success) {
+        setStores(response.data.data.data);
+        dispatch(setAllStores(response.data.data.data));
+      }
+    } catch (error) {
+      message.error('Failed to load stores');
+    }
+  }
+
+  useEffect(() => {
+    fetchStores();
+  }, [])
+
   return (
     <div className="App">
       <Router>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/item-purchase" element={<Home />} />
@@ -46,17 +82,12 @@ function App() {
           <Route path="/parcel-delivery" element={<Landing />} />
           <Route path="/parcel-delivery/order" element={<DeliveryOrder />} />
 
-
-
-
           {/* Dashboard */}
           <Route path="/dashboard" element={<DashboardLayout> <Dashboard /> </DashboardLayout>} />
           <Route path="/dashboard/wallet" element={<DashboardLayout> <Wallet /> </DashboardLayout>} />
           <Route path="/dashboard/booking" element={<DashboardLayout> <Booking /> </DashboardLayout>} />
           <Route path="/dashboard/profile" element={<DashboardLayout> <Profile /> </DashboardLayout>} />
           <Route path="/dashboard/support" element={<DashboardLayout> <Support /> </DashboardLayout>} />
-
-
 
           {/* <Route path="/login" element={<LoginPage />} /> */}
           <Route path="/login" element={<PhoneLogin />} />

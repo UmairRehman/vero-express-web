@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import { addToCart } from '../../../services/basket';
+import { message } from 'antd';
+import DefaultImage from '../../../assets/images/default-image.webp';
 
 export default function ProductCard({
+    id, // product_id
     title,
     category,
     price,
@@ -11,8 +15,39 @@ export default function ProductCard({
     image,
     bestSeller,
     outOfStock,
+    storeName,
+    pictures = []
 }) {
     const navigate = useNavigate();
+    const [imgError, setImgError] = useState(false);
+    const handleAddToCart = async (e) => {
+        e.preventDefault();
+        if (outOfStock) return;
+        try {
+            const payload = {
+                items: [
+                    {
+                        product_id: id,
+                        quantity: 1,
+                    },
+                ],
+                store_name: storeName,
+            };
+            const res = await addToCart(payload);
+            if (res.data.success) {
+                message.success("Item Adeed to cart.");
+
+            } else {
+                message.error("Something went wrong");
+            }
+        } catch (err) {
+            message.error("Something wend wrong");
+        }
+    };
+
+    const productImage =
+        pictures && pictures.length > 0 ? pictures[0] : image || null;
+
 
     return (
         <div className="prod_item">
@@ -22,10 +57,27 @@ export default function ProductCard({
                 <span className="wishlist">
                     <i className="fa fa-heart"></i>
                 </span>
-                <img className="prod_img" src={image} alt={title} />
+                {/* <img className="prod_img" src={image} alt={title} />
+                 */}
+                {productImage && !imgError ? (
+                    <img
+                        className="prod_img"
+                        src={productImage}
+                        alt={title}
+                        onError={() => setImgError(true)} // mark error if image fails
+                    />
+                ) : (
+                    <div className="prod_img flex items-center justify-center bg-gray-100 h-[200px]">
+                        <img
+                            className="prod_img"
+                            src={DefaultImage}
+                            alt={title}
+                        />
+                    </div>
+                )}
             </div>
             <div className="prod_txt">
-                <a onClick={()=> navigate("../item-purchase/product-details")} className="prod_title">{title}</a>
+                <a onClick={() => navigate("../item-purchase/product-details")} className="prod_title">{title}</a>
                 <span className="prod_cat">{category}</span>
                 <div className="prod-star">
                     {[...Array(5)].map((_, i) => (
@@ -36,7 +88,9 @@ export default function ProductCard({
                 <h5>
                     ${price.toFixed(2)} <ins>${oldPrice.toFixed(2)}</ins>
                 </h5>
-                <a href="#" className="btn btn-orange add_to_cart">Add to Cart</a>
+                <a className="btn btn-orange add_to_cart" onClick={handleAddToCart}>
+                    Add to Cart
+                </a>
             </div>
         </div>
     );

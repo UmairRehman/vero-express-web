@@ -1,27 +1,50 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { getStoreCategories } from '../../../services/stores';
 
 const filtersData = {
-    offers: ["Free Shipping", "On Sale", "Best Sellers"],
     price: ["Under 25", "Under 50", "Under 75", "50to100", "Custom"],
-    colors: ["Black", "White", "Grey", "Yellow", "Orange", "Red", "Violet"],
-    shopLocation: ["Any Where", "United State", "Custom"],
-    shipTo: ["United State", "United Arab Emirates"],
+    // colors: ["Black", "White", "Grey", "Yellow", "Orange", "Red", "Violet"],
+    // shopLocation: ["Any Where", "United State", "Custom"],
+    // shipTo: ["United State", "United Arab Emirates"],
 };
 
 export default function SidebarFilter() {
     const [searchParams, setSearchParams] = useSearchParams();
-
-    const [selectedOffer, setSelectedOffer] = useState("");
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("");
     const [selectedPrice, setSelectedPrice] = useState("");
     const [customPrice, setCustomPrice] = useState({ low: "", high: "" });
     const [selectedColor, setSelectedColor] = useState("");
     const [selectedLocation, setSelectedLocation] = useState("");
     const [shipTo, setShipTo] = useState("");
+    const [showAllCategories, setShowAllCategories] = useState(false);
+
+    // Fetch categories when store_name changes
+    useEffect(() => {
+        const storeName = searchParams.get("store_name");
+        const fetchCategories = async () => {
+            if (storeName) {
+                try {
+                    const res = await getStoreCategories({ store_name: storeName, page: 1 });
+                    if (res?.data?.data.data) {
+                        setCategories(res.data.data.data);
+                    } else {
+                        setCategories([]);
+                    }
+                } catch {
+                    setCategories([]);
+                }
+            } else {
+                setCategories([]);
+            }
+        };
+        fetchCategories();
+    }, [searchParams]);
 
     // Load from query params
     useEffect(() => {
-        setSelectedOffer(searchParams.get("offer") || "");
+        setSelectedCategory(searchParams.get("parent_id") || "");
         setSelectedPrice(searchParams.get("price") || "");
         setCustomPrice({
             low: searchParams.get("low") || "",
@@ -32,41 +55,33 @@ export default function SidebarFilter() {
         setShipTo(searchParams.get("shipto") || "");
     }, []);
 
-    // Trigger on change (mock API call)
-    useEffect(() => {
-        console.log("Filters changed, make API call...");
-        // you can call your API here
-    }, [selectedOffer, selectedPrice, customPrice, selectedColor, selectedLocation, shipTo]);
-
     // Update query params
     const updateParams = () => {
         const params = new URLSearchParams();
         params.set("store_name", searchParams.get("store_name") || "");
-        if (selectedOffer) params.set("offer", selectedOffer);
+        if (selectedCategory) params.set("parent_id", selectedCategory);
         if (selectedPrice) params.set("price", selectedPrice);
         if (customPrice.low) params.set("low", customPrice.low);
         if (customPrice.high) params.set("high", customPrice.high);
         if (selectedColor) params.set("color", selectedColor);
         if (selectedLocation) params.set("location", selectedLocation);
         if (shipTo) params.set("shipto", shipTo);
-        setSearchParams(params);    
+        setSearchParams(params);
     };
 
     const resetAll = () => {
-        setSelectedOffer("");
+        setSelectedCategory("");
         setSelectedPrice("");
         setCustomPrice({ low: "", high: "" });
         setSelectedColor("");
         setSelectedLocation("");
         setShipTo("");
         setSearchParams({});
-        console.log("Updating query params...");
     };
 
     useEffect(() => {
         updateParams();
-        console.log("Updating query params...");
-    }, [selectedOffer, selectedPrice, customPrice, selectedColor, selectedLocation, shipTo]);
+    }, [selectedCategory, selectedPrice, customPrice, selectedColor, selectedLocation, shipTo]);
 
     return (
         <div className="col-md-3">
@@ -74,22 +89,31 @@ export default function SidebarFilter() {
                 <h4>Filter</h4>
 
                 <div className="sfil-blk">
-                    <h5>Special Offers</h5>
+                    <h5>Category</h5>
                     <ul>
-                        {filtersData.offers.map((offer) => (
-                            <li key={offer}>
+                        {(showAllCategories ? categories : categories.slice(0, 10)).map((cat) => (
+                            <li key={cat._id}>
                                 <label>
                                     <input
                                         type="radio"
-                                        name="offer"
-                                        checked={selectedOffer === offer}
-                                        onChange={() => setSelectedOffer(offer)}
+                                        name="category"
+                                        checked={selectedCategory === cat._id}
+                                        onChange={() => setSelectedCategory(cat._id)}
                                     />{" "}
-                                    {offer}
+                                    {cat.name}
                                 </label>
                             </li>
                         ))}
                     </ul>
+                    {categories.length > 10 && (
+                        <button
+                            className="btn btn-link p-0"
+                            style={{ fontSize: "0.95em" }}
+                            onClick={() => setShowAllCategories((prev) => !prev)}
+                        >
+                            {showAllCategories ? "See Less" : "See More"}
+                        </button>
+                    )}
                 </div>
 
                 <div className="sfil-blk">
@@ -133,7 +157,7 @@ export default function SidebarFilter() {
                         </li>
                     </ul>
                 </div>
-
+                {/* 
                 <div className="sfil-blk">
                     <h5>Colors</h5>
                     <ul>
@@ -170,13 +194,13 @@ export default function SidebarFilter() {
                             </li>
                         ))}
                     </ul>
-                </div>
+                </div> */}
 
                 <div className="sfil-blk">
                     <h5>Ship to</h5>
                     <ul>
                         <li>
-                            <div className="lowtohigh">
+                            {/* <div className="lowtohigh">
                                 <select
                                     className="form-control"
                                     value={shipTo}
@@ -189,13 +213,10 @@ export default function SidebarFilter() {
                                         </option>
                                     ))}
                                 </select>
-                            </div>
+                            </div> */}
                             <div className="reset-btns mt-2">
                                 <button className="btn btn-transparent" onClick={resetAll}>
                                     Reset
-                                </button>
-                                <button className="btn btn-orange" onClick={updateParams}>
-                                    Apply
                                 </button>
                             </div>
                         </li>

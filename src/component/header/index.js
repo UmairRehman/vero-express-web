@@ -63,7 +63,7 @@ const Header = () => {
                   <li><div className="flags"></div></li>
                   {user?._id &&
                     <li>
-                      <a className="btn btn-red btn-cart" >
+                      <a onClick={() => navigate("../item-purchase/cart-details")} className="btn btn-red btn-cart" >
                         <img src={cartIcon} alt="Cart" />
                       </a>
                     </li>

@@ -1,74 +1,170 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TempImage from '../../../assets/images/prod1.jpg'
 import CartItem from "./cart.product";
-
-
-const initialCartItems = [
-    {
-        id: 1,
-        category: "Women-Fashion",
-        title: "Ladies Purse Bag - Original Leather",
-        image: TempImage,
-        price: 30.0,
-        originalPrice: 47.0,
-        stock: "In Stock",
-        quantity: 1,
-    },
-    {
-        id: 2,
-        category: "Women-Fashion",
-        title: "Ladies Purse Bag - Original Leather",
-        image: TempImage,
-        price: 30.0,
-        originalPrice: 47.0,
-        stock: "In Stock",
-        quantity: 1,
-    },
-    {
-        id: 3,
-        category: "Women-Fashion",
-        title: "Ladies Purse Bag - Original Leather",
-        image: TempImage,
-        price: 30.0,
-        originalPrice: 47.0,
-        stock: "In Stock",
-        quantity: 1,
-    },
-];
-
+import { getCart, deleteCartItem, updateBasket } from '../../../services/basket';
+import { message } from 'antd';
+import { useSelector } from "react-redux";
+import { getSelectedStoreDetails } from "../../../redux/feature/stores";
+import { useNavigate } from "react-router-dom";
 
 const CartProductDetails = () => {
-    const [cartItems, setCartItems] = useState(initialCartItems);
+    const [cartItems, setCartItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const { navigate } = useNavigate();
+    const {
+        selectedStore
+    } = useSelector(getSelectedStoreDetails) || null;
 
-    const handleQtyChange = (id, delta) => {
-        setCartItems((items) =>
-            items.map((item) =>
-                item.id === id
-                    ? { ...item, quantity: Math.max(1, Math.min(item.quantity + delta, 10)) }
-                    : item
-            )
-        );
+    const storeName = selectedStore.display_name || null;
+
+    useEffect(() => {
+        if (!storeName) {
+            message.error("Store name is not available. Please select a store to proceed.");
+            navigate("./")
+        }
+    }, [])
+
+    useEffect(() => {
+        fetchCartItems();
+    }, []);
+
+    const fetchCartItems = async () => {
+        try {
+            setLoading(true);
+            const response = await getCart();
+            if (response.data && response.data.data.basket) {
+                const basket = response.data.data.basket;
+                const processedItems = basket.items.map(item => {
+                    // Use API data with static fallbacks for missing values
+                    return {
+                        id: item._id || `item_${Date.now()}`,
+                        category: item.category || "General",
+                        title: item.title || "Product",
+                        image: item.image || TempImage,
+                        price: item.price || 25.0,
+                        originalPrice: item.originalPrice || 35.0,
+                        stock: item.stock || "In Stock",
+                        quantity: item.quantity || 1,
+                    };
+                });
+
+                setCartItems(processedItems);
+            } else {
+                message.error("No basket data found");
+                setCartItems([]);
+            }
+        } catch (error) {
+            setError('Failed to load cart items');
+            message.error("Failed to load cart items");
+            setCartItems([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleDelete = (id) => {
-        setCartItems((items) => items.filter((item) => item.id !== id));
+    const handleQtyChange = async (id, delta) => {
+        try {
+            // Find current item to calculate new quantity
+            const currentItem = cartItems.find(item => item.id === id);
+            if (!currentItem) return;
+
+            // Calculate new quantity based on current quantity + delta
+            const newQuantity = Math.max(1, Math.min(10, currentItem.quantity + delta));
+
+            // Update local state first for immediate UI feedback
+            setCartItems((items) =>
+                items.map((item) =>
+                    item.id === id
+                        ? { ...item, quantity: newQuantity }
+                        : item
+                )
+            );
+
+            // Prepare payload for API with updated quantities
+            const updatedItems = cartItems.map(item => ({
+                product_id: item.id,
+                quantity: item.id === id ? newQuantity : item.quantity
+            }));
+
+            // Call API to update basket
+            const response = await updateBasket({
+                items: updatedItems,
+                store_name: storeName
+            });
+
+            if (response.data && response.data.success) {
+                message.success("Cart updated successfully");
+                // Refresh cart to ensure sync with server
+                await fetchCartItems();
+            } else {
+                message.error("Failed to update cart");
+                // Revert local state if API call failed
+                await fetchCartItems();
+            }
+        } catch (error) {
+            console.error("Error updating cart:", error);
+            message.error("Failed to update cart");
+            // Revert local state if API call failed
+            await fetchCartItems();
+        }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            const response = await deleteCartItem(id);
+            if (response.data && response.data.success) {
+                message.success("Item removed from cart successfully");
+                await fetchCartItems();
+            } else {
+                message.error("Failed to remove item from cart");
+            }
+        } catch (error) {
+            message.error("Failed to remove item from cart");
+        }
     };
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const delivery = cartItems.length ? 10.0 : 0;
     const total = subtotal + delivery;
 
+    if (loading) {
+        return (
+            <div className="cart-products">
+                <div className="text-center py-4">
+                    <p>Loading cart items...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="cart-products">
+                <div className="text-center py-4 text-danger">
+                    <p>{error}</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <>
             <div className="cart-products">
-                {cartItems.map((item) => (
-                    <CartItem
-                        key={item.id}
-                        item={item}
-                        onQtyChange={handleQtyChange}
-                        onDelete={handleDelete}
-                    />
-                ))}
+                {cartItems.length > 0 ? (
+                    cartItems.map((item) => (
+                        <CartItem
+                            key={item.id}
+                            item={item}
+                            onQtyChange={handleQtyChange}
+                            onDelete={handleDelete}
+                        />
+                    ))
+                ) : (
+                    <div className="text-center py-4">
+                        <p>Your cart is empty</p>
+                    </div>
+                )}
             </div>
 
             <div className="car-left-total">

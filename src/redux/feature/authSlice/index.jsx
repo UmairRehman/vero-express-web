@@ -31,10 +31,15 @@ const userSlice = createSlice({
       state.token = "";
       state.user = null;
     },
+    updateUserAddresses: (state, action) => {
+      if (state.user) {
+        state.user.addresses = action.payload;
+      }
+    },
   },
 });
 
-export const { Authenticate, Logout } =
+export const { Authenticate, Logout, updateUserAddresses } =
   userSlice.actions;
 export const getUserDetails = (state) => state.user;
 export const getUserPermissions = (state) => state.user;

@@ -1,6 +1,8 @@
 import React, { useState } from "react"
+import { useNavigate } from "react-router-dom";
 
 function PricingSection({ subtotal, delivery, itemCount }) {
+    const navigate = useNavigate();
     const [appliedCode, setAppliedCode] = useState("");
     const [promoCode, setPromoCode] = useState("");
     const [discount, setDiscount] = useState(0);
@@ -53,7 +55,7 @@ function PricingSection({ subtotal, delivery, itemCount }) {
                             <label>Estimated Total</label> <strong>${estimatedTotal.toFixed(2)}</strong>
                         </li>
                     </ul>
-                    <button className="btn btn-ornage proceed_checkout">Proceed to Checkout</button>
+                    <button onClick={() => navigate("/item-purchase/checkout")} className="btn btn-ornage proceed_checkout">Proceed to Checkout</button>
                 </div>
             </div>
         </>

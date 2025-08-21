@@ -8,7 +8,7 @@ const PhoneLogin = () => {
     const navigate = useNavigate();
     const [phone, setPhone] = useState("");
     const [touched, setTouched] = useState(false);
-    const [loader, setLoader] = useNavigate(false)
+    const [loader, setLoader] = useState(false)
 
     const isValidPhone = (num) => {
         const digits = num.replace(/\D/g, "");

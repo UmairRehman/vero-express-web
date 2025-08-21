@@ -1,8 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import alterImg1 from '../../assets/images/alter-img-1.jpg';
 import alterImg2 from '../../assets/images/alter-img-2.jpg';
 
 const Craving = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="sec-alter">
       <div className="container">
@@ -20,7 +23,7 @@ const Craving = () => {
             <p>
               Get a slice of pizza or the whole pie delivered, or pick up house lo mein from the Chinese takeout spot you've been meaning to try.
             </p>
-            <a className="btn btn-green" >
+            <a className="btn btn-green" onClick={() => navigate('/item-purchase/explore')}>
               Explore Shops <i className="r-arrow"></i>
             </a>
           </div>
@@ -39,7 +42,7 @@ const Craving = () => {
             <p>
               Get a slice of pizza or the whole pie delivered, or pick up house lo mein from the Chinese takeout spot you've been meaning to try.
             </p>
-            <a className="btn btn-green" >
+            <a className="btn btn-green" onClick={() => navigate('/item-purchase/explore')}>
               Explore Shops <i className="r-arrow"></i>
             </a>
           </div>
