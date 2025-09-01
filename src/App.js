@@ -72,11 +72,11 @@ function App() {
           <Route path="/item-purchase" element={<Home />} />
           <Route path="/item-purchase/explore" element={<ItemExplore />} />
           <Route path="/item-purchase/shop" element={<Shop />} />
-          <Route path="/item-purchase/product-details" element={<ProductDetails />} />
+          <Route path="/item-purchase/product-details/:id" element={<ProductDetails />} />
           <Route path="/item-purchase/cart-details" element={<CartDetails />} />
           <Route path="/item-purchase/checkout" element={<Checkout />} />
           <Route path="/item-purchase/tracking" element={<Tracking />} />
-          <Route path="/item-purchase/compare" element={<Compare />} />
+          <Route path="/item-purchase/compare/:id" element={<Compare />} />
 
           {/* // Parcel Delivery */}
           <Route path="/parcel-delivery" element={<Landing />} />

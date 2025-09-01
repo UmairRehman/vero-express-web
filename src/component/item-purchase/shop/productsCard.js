@@ -77,8 +77,8 @@ export default function ProductCard({
                 )}
             </div>
             <div className="prod_txt">
-                <a onClick={() => navigate("../item-purchase/product-details")} className="prod_title">{title}</a>
-                <span className="prod_cat">{category}</span>
+                <a onClick={() => navigate(`../item-purchase/product-details/${id}`)} className="prod_title">{title}</a>
+                {/* <span className="prod_cat">{category}</span> */}
                 <div className="prod-star">
                     {[...Array(5)].map((_, i) => (
                         <i key={i} className="fa fa-star"></i>

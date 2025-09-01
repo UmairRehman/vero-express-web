@@ -1,11 +1,11 @@
 import GiftImage from "../../../assets/images/gift_ico.png";
 import PricingSection from "../checkout/pricingSection";
 
-const CartSummary = ({ subtotal = 430.0, delivery = 30.0, itemCount = 3 }) => {
+const CartSummary = ({ subtotal, itemCount }) => {
 
     return (
         <>
-            <PricingSection subtotal={subtotal} delivery={delivery} itemCount={itemCount} />
+            <PricingSection subtotal={subtotal} itemCount={itemCount} />
             <div className="cart-gift">
                 <div className="cart-img">
                     <img className="cart_gift" src={GiftImage} alt="Gift icon" />
@@ -19,9 +19,11 @@ const CartSummary = ({ subtotal = 430.0, delivery = 30.0, itemCount = 3 }) => {
     );
 };
 
-function CartSummaryMain() {
+function CartSummaryMain({ cartItems }) {
+    // Assuming cartItems is passed as a prop, you can use it to calculate totals
+    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     return (
-        <CartSummary subtotal={430} delivery={30} itemCount={3} />
+        <CartSummary subtotal={subtotal} itemCount={cartItems?.length} />
     );
 }
 export default CartSummaryMain;

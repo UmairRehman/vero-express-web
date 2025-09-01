@@ -21,4 +21,28 @@ export const searchStoreProducts = async (params = {}) => {
         page: params.page || 1,
     }).toString();
     return Api.get(`/stores/search-product?${query}`);
-}; 
+};
+
+// Search products in a store with filters
+export const searchProductsByName = async (params = {}) => {
+    // Build query string from params
+    const query = new URLSearchParams({
+        product_name: params.product_name,
+    }).toString();
+    return Api.get(`/stores/search-product?${query}`);
+};
+
+// Get product details by ID
+export const getProductDetails = async (productId) => {
+    return Api.get(`/stores/products/${productId}`);
+};
+
+export const getSingleProductDetails = async (productId) => {
+    return Api.get(`/stores/single/products/${productId}`);
+};
+
+export const getSingleStoreDetails = async (storeId) => {
+    return Api.get(`/stores/single/${storeId}`);
+};
+
+

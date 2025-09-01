@@ -10,8 +10,9 @@ import ProductImage from '../../../assets/images/prod1.jpg'
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from 'react-redux'
 import { getSelectedStoreDetails } from '../../../redux/feature/stores'
-import { searchStoreProducts } from '../../../services/stores';
+import { getSingleStoreDetails, searchStoreProducts } from '../../../services/stores';
 import { getCart } from '../../../services/basket';
+import { message } from 'antd'
 
 function ScrollToTop() {
     const { pathname } = useLocation();
@@ -22,48 +23,55 @@ function ScrollToTop() {
 }
 
 function Shop() {
-    const location = useLocation();
-    const navigate = useNavigate();
     const { selectedStore } = useSelector(getSelectedStoreDetails) || null;
     const [searchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [cartItems, setCartItems] = useState([]);
+    const [store, setStore] = useState([]);
 
+    const [loading, setLoading] = useState(false);
+
+    const fetchStore = async () => {
+        setLoading(true);
+        const storeId = searchParams.get("store_id");
+        console.log("Store Id:", storeId);
+        try {
+            const res = await getSingleStoreDetails(storeId);
+            if (res?.data?.data) {
+                setStore(res.data.data);
+            } else {
+                setStore([]);
+            }
+        } catch {
+            message.error('Failed to load stores');
+        }
+        setLoading(false);
+    };
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const params = Object.fromEntries([...searchParams.entries()]);
-                const res = await searchStoreProducts(params);
-                if (res?.data?.data.data) {
-                    setProducts(res.data.data.data);
-                } else {
-                    setProducts([]);
-                }
-            } catch {
+        fetchStore();
+    }, [searchParams]);
+
+
+
+    const fetchProducts = async () => {
+        setLoading(true);
+        try {
+            const params = Object.fromEntries([...searchParams.entries()]);
+            const res = await searchStoreProducts(params);
+            if (res?.data?.data.data) {
+                setProducts(res.data.data.data);
+            } else {
                 setProducts([]);
             }
-            setLoading(false);
-        };
+        } catch {
+            message.error('Failed to load stores');
+        }
+        setLoading(false);
+    };
+    useEffect(() => {
+
         fetchProducts();
     }, [searchParams]);
 
-    useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                const res = await getCart();
-                if (res?.data?.data?.basket?.items) {
-                    setCartItems(res.data.data.basket.items);
-                } else {
-                    setCartItems([]);
-                }
-            } catch {
-                setCartItems([]);
-            }
-        };
-        fetchCart();
-    }, []);
 
     return (
         <>
@@ -71,7 +79,7 @@ function Shop() {
             <Header />
             <SubHeader />
             <Breadcrumb />
-            <StoreInfo store={selectedStore} />
+            <StoreInfo store={store} />
             <section className="store-product">
                 <div className="container">
                     <div className="row">
@@ -87,13 +95,13 @@ function Shop() {
                                     products.map((product, index) => (
                                         <div className="col-md-4" key={product._id || index}>
                                             <ProductCard
+                                                id={product._id}
                                                 title={product.product_name}
                                                 category={product.product_category}
                                                 price={product.product_price}
                                                 oldPrice={product.product_price}
                                                 rating={product.product_rating}
                                                 reviews={0}
-                                                // image={product.pictures && product.pictures[0]}
                                                 image={product.product_image}
                                                 bestSeller={false}
                                                 outOfStock={false}

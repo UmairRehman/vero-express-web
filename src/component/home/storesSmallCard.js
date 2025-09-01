@@ -38,7 +38,7 @@ function StoresSmallCard() {
                             style={{ cursor: 'pointer' }}
                             onClick={() => {
                                 navigate(
-                                    `/item-purchase/shop?store_name=${encodeURIComponent(store.store_name || store.display_name)}`
+                                    `/item-purchase/shop?store_name=${encodeURIComponent(store.store_name || store.display_name)}&store_id=${store._id}`
                                 );
                                 dispatch(setSelectedStore(store));
                             }}

@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom";
 
-function PricingSection({ subtotal, delivery, itemCount }) {
+function PricingSection({ subtotal, itemCount }) {
     const navigate = useNavigate();
     const [appliedCode, setAppliedCode] = useState("");
     const [promoCode, setPromoCode] = useState("");
@@ -15,7 +15,7 @@ function PricingSection({ subtotal, delivery, itemCount }) {
             setAppliedCode("Invalid code");
         }
     };
-    const estimatedTotal = subtotal - discount + delivery;
+    const estimatedTotal = subtotal;
 
     return (
         <>
@@ -47,7 +47,7 @@ function PricingSection({ subtotal, delivery, itemCount }) {
                     <ul>
                         <li><label>Subtotal (items)</label> <strong>{itemCount}</strong></li>
                         <li><label>Price (Total)</label> <strong>${subtotal.toFixed(2)}</strong></li>
-                        <li><label>Delivery</label> <strong>${delivery.toFixed(2)}</strong></li>
+                        {/* <li><label>Delivery</label> <strong>${delivery.toFixed(2)}</strong></li> */}
                         {discount > 0 && (
                             <li><label>Discount</label> <strong>- ${discount.toFixed(2)}</strong></li>
                         )}

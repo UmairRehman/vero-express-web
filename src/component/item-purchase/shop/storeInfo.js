@@ -1,8 +1,7 @@
-import React from 'react'
-import Avatar from '../../../assets/images/avatar.jpg'
-import StoreBannerImage from '../../../assets/images/store-banner.jpg'
+
 
 function StoreInfo({ store }) {
+    if (!store) return <></>;
     return (
         <>
             <section class="strdef-banner">
@@ -11,7 +10,9 @@ function StoreInfo({ store }) {
 
                         <div class="col-md-12">
                             <div class="strdef-bann">
-                                <img class="str-banner" src={store?.pictures[0]} alt="" />
+                                {store?.pictures && store?.pictures?.length > 0 &&
+                                    <img class="str-banner" src={store?.pictures[0]} alt="" />
+                                }
                                 <div class="str-def-list">
                                     <div class="str-def-icon">
                                         <img height={"150px"} src={store?.store_logo} alt="" />

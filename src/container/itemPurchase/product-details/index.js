@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import Header from '../../../component/header'
 import SubHeader from '../../../component/shared/subHeader'
 import Breadcrumb from '../../../component/item-purchase/breadcrumbs'
@@ -9,9 +10,19 @@ import Footer from '../../../component/footer'
 import BestSeller from '../../../component/item-purchase/shop/bestSeller'
 import TempImage from "../../../assets/images/prod-detail-1.jpg";
 import { useNavigate } from 'react-router-dom'
+import { getSingleProductDetails } from '../../../services/stores';
+import { message } from "antd";
+import { addToCart } from "../../../services/basket";
+import DefaultImage from '../../../assets/images/default-image.webp';
+
 
 function ProductDetails() {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const params = new URLSearchParams();
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+
     const imageList = [
         TempImage, TempImage, TempImage, TempImage, TempImage, TempImage
     ];
@@ -20,9 +31,31 @@ function ProductDetails() {
     const [selectedColor, setSelectedColor] = useState("black");
     const [quantity, setQuantity] = useState(1);
 
-
     const sizes = ["XL", "L", "M", "S"];
     const colors = ["blue", "orange", "red", "green", "black"];
+
+    // Fetch product details when component mounts
+    useEffect(() => {
+        const fetchProductDetails = async () => {
+            if (!id) return;
+
+            setLoading(true);
+
+            try {
+                const response = await getSingleProductDetails(id);
+
+                if (response?.data.success && response?.data) {
+                    setProduct(response.data.data);
+                }
+            } catch (err) {
+                message.error('Failed to load product details');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProductDetails();
+    }, [id]);
 
     const changeImage = (img) => setSelectedImage(img);
 
@@ -31,21 +64,46 @@ function ProductDetails() {
 
     const decrementQty = () =>
         setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
+    console.log(params, 'asdasd');
 
+
+    const handleAddToCart = async (e) => {
+        e.preventDefault();
+        try {
+            const payload = {
+                items: [
+                    {
+                        product_id: product._id,
+                        quantity: 1,
+                    },
+                ],
+                store_name: product.product_store
+            };
+            const res = await addToCart(payload);
+            if (res.data.success) {
+                message.success("Item Added to cart.");
+
+            } else {
+                message.error("Something went wrong");
+            }
+        } catch (err) {
+            message.error("Something wend wrong");
+        }
+    };
 
     return (
         <>
             <Header />
             <SubHeader />
             <Breadcrumb />
-            <section class="product-banner">
-                <div class="container">
+            <section className="product-banner">
+                <div className="container">
                     <div className="row row-product">
                         {/* Left Image Section */}
                         <div className="col-md-5">
                             <div className="slider-img">
                                 <div className="main-image">
-                                    <img id="display-image" src={selectedImage} alt="Product" />
+                                    <img id="display-image" src={product?.product_image ? product.product_image : DefaultImage} alt="Product" />
                                 </div>
                                 {/* <div className="thumbnails">
                                     {imageList.map((img, i) => (
@@ -64,8 +122,8 @@ function ProductDetails() {
                         {/* Right Product Info Section */}
                         <div className="col-md-7">
                             <div className="prod-detail">
-                                <h5>Women-Fashion</h5>
-                                <h1>Ladies Purse Bag - Original Leather</h1>
+                                <h5>{product?.product_category?.name}</h5>
+                                <h1>{product?.product_name}</h1>
 
                                 <div className="prod-star">
                                     {[...Array(5)].map((_, i) => (
@@ -75,20 +133,21 @@ function ProductDetails() {
                                 </div>
 
                                 <ul className="price-select">
-                                    <li>
+                                    {/* <li>
                                         <label>Was:</label>
                                         <span>
                                             <strike>USD 430.00</strike> <i>Inclusive of VAT</i>
                                         </span>
-                                    </li>
+                                    </li> */}
                                     <li>
                                         <label>Now:</label>
-                                        <h4>USD 230.00</h4>
+                                        <h4>USD {product?.product_price}</h4>
                                     </li>
-                                    <li>
-                                        <label>Size:</label>
-                                        <b>{selectedSize}</b>
-                                        <div className="sise-label">
+                                    {product?.product_size &&
+                                        <li>
+                                            <label>Size:</label>
+                                            <b>{product?.product_size}</b>
+                                            {/* <div className="sise-label">
                                             {sizes.map((size) => (
                                                 <label key={size}>
                                                     <input
@@ -100,9 +159,10 @@ function ProductDetails() {
                                                     <span>{size}</span>
                                                 </label>
                                             ))}
-                                        </div>
-                                    </li>
-                                    <li>
+                                        </div> */}
+                                        </li>
+                                    }
+                                    {/* <li>
                                         <label>Color:</label>
                                         <b>{selectedColor}</b>
                                         <div className="sise-label">
@@ -118,12 +178,12 @@ function ProductDetails() {
                                                 </label>
                                             ))}
                                         </div>
-                                    </li>
+                                    </li> */}
                                 </ul>
 
                                 {/* Quantity + Add to Cart */}
                                 <div className="qty-input-add">
-                                    <div className="qty-input">
+                                    {/* <div className="qty-input">
                                         <button
                                             className="qty-count qty-count--minus"
                                             onClick={decrementQty}
@@ -144,8 +204,8 @@ function ProductDetails() {
                                         >
                                             +
                                         </button>
-                                    </div>
-                                    <button className="btn btn-orange btn-add-to-cart" type="button">
+                                    </div> */}
+                                    <button onClick={handleAddToCart} className="btn btn-green compare_product" type="button">
                                         Add to cart
                                     </button>
                                 </div>
@@ -155,12 +215,12 @@ function ProductDetails() {
                                     <a onClick={() => navigate("../item-purchase/cart-details")} className="btn btn-black view_cart" href="#viewcart">
                                         View Cart
                                     </a>
-                                    <a className="btn btn-green compare_product" href="#compareproducts">
+                                    <a onClick={() => navigate("../item-purchase/compare/" + product._id)} className="btn btn-green compare_product">
                                         Compare Products
                                     </a>
-                                    <a className="btn btn-red add_to_wishlist" href="#addtowishlist">
+                                    {/* <a className="btn btn-red add_to_wishlist" href="#addtowishlist">
                                         Add to Wishlist
-                                    </a>
+                                    </a> */}
                                 </div>
                             </div>
                         </div>

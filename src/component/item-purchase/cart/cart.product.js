@@ -31,7 +31,7 @@ const CartItem = ({ item, onQtyChange, onDelete }) => {
                         <button onClick={() => onQtyChange(item.id, 1)} className="qty-count qty-count--add">+</button>
                     </div>
                     <div className="cart_sv_de">
-                        <a style={{ cursor: "pointer" }} className="cart_save"><i className="fa fa-heart"></i> Save</a>
+                        {/* <a style={{ cursor: "pointer" }} className="cart_save"><i className="fa fa-heart"></i> Save</a> */}
                         <a style={{ cursor: "pointer" }} className="cart_del cursor-pointer" onClick={() => onDelete(item.id)}><i className="fa fa-trash"></i> Delete</a>
                     </div>
                 </div>

@@ -7,11 +7,8 @@ import { useSelector } from "react-redux";
 import { getSelectedStoreDetails } from "../../../redux/feature/stores";
 import { useNavigate } from "react-router-dom";
 
-const CartProductDetails = () => {
-    const [cartItems, setCartItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const { navigate } = useNavigate();
+const CartProductDetails = ({ cartItems, setCartItems, fetchCartItems, loading, error }) => {
+    const navigate = useNavigate();
     const {
         selectedStore
     } = useSelector(getSelectedStoreDetails) || null;
@@ -21,47 +18,10 @@ const CartProductDetails = () => {
     useEffect(() => {
         if (!storeName) {
             message.error("Store name is not available. Please select a store to proceed.");
-            navigate("./")
+            navigate("/");
         }
     }, [])
 
-    useEffect(() => {
-        fetchCartItems();
-    }, []);
-
-    const fetchCartItems = async () => {
-        try {
-            setLoading(true);
-            const response = await getCart();
-            if (response.data && response.data.data.basket) {
-                const basket = response.data.data.basket;
-                const processedItems = basket.items.map(item => {
-                    // Use API data with static fallbacks for missing values
-                    return {
-                        id: item._id || `item_${Date.now()}`,
-                        category: item.category || "General",
-                        title: item.title || "Product",
-                        image: item.image || TempImage,
-                        price: item.price || 25.0,
-                        originalPrice: item.originalPrice || 35.0,
-                        stock: item.stock || "In Stock",
-                        quantity: item.quantity || 1,
-                    };
-                });
-
-                setCartItems(processedItems);
-            } else {
-                message.error("No basket data found");
-                setCartItems([]);
-            }
-        } catch (error) {
-            setError('Failed to load cart items');
-            message.error("Failed to load cart items");
-            setCartItems([]);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleQtyChange = async (id, delta) => {
         try {
@@ -103,10 +63,7 @@ const CartProductDetails = () => {
                 await fetchCartItems();
             }
         } catch (error) {
-            console.error("Error updating cart:", error);
             message.error("Failed to update cart");
-            // Revert local state if API call failed
-            await fetchCartItems();
         }
     };
 
@@ -125,8 +82,8 @@ const CartProductDetails = () => {
     };
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const delivery = cartItems.length ? 10.0 : 0;
-    const total = subtotal + delivery;
+    // const delivery = cartItems.length ? 10.0 : 0;
+    const total = subtotal;
 
     if (loading) {
         return (
@@ -175,7 +132,7 @@ const CartProductDetails = () => {
                     <div className="col-md-6">
                         <ul>
                             <li><label>Subtotal:</label><b>${subtotal.toFixed(2)}</b></li>
-                            <li><label>Delivery:</label><b>${delivery.toFixed(2)}</b></li>
+                            {/* <li><label>Delivery:</label><b>${delivery.toFixed(2)}</b></li> */}
                             <li className="clt-total"><label>Total:</label><b>${total.toFixed(2)}</b></li>
                         </ul>
                     </div>

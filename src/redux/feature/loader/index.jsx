@@ -18,10 +18,14 @@ const loaderSlice = createSlice({
       state.loading = 0;
       state.totalRequest = 0;
     },
+    resetLoader: (state) => {
+      state.loading = 0;
+      state.totalRequest = 0;
+    },
   },
 });
 
-export const { TotalRequest, FinishLoading, ResetLoading } =
+export const { TotalRequest, FinishLoading, ResetLoading, resetLoader } =
   loaderSlice.actions;
 
 export const getLoadStatus = (state) => state.loading.loading;

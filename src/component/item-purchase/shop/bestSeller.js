@@ -4,52 +4,9 @@ import Slider from "react-slick";
 import { searchStoreProducts } from "../../../services/stores";
 import { getAllStoreDetails } from "../../../redux/feature/stores";
 import { useSelector } from "react-redux";
-const bestSellers = [
-    {
-        id: 2,
-        title: "Nike Aiforce Shoes",
-        category: "Men-Shoes",
-        price: 230,
-        oldPrice: 630,
-        rating: 4.8,
-        reviews: 20,
-        image: TempImage,
-        bestSeller: true,
-    },
-    {
-        id: 3,
-        title: "Nike Aiforce Shoes",
-        category: "Men-Shoes",
-        price: 230,
-        oldPrice: 630,
-        rating: 4.8,
-        reviews: 20,
-        image: TempImage,
-        bestSeller: true,
-    },
-    {
-        id: 4,
-        title: "Nike Aiforce Shoes",
-        category: "Men-Shoes",
-        price: 230,
-        oldPrice: 630,
-        rating: 4.8,
-        reviews: 20,
-        image: TempImage,
-        bestSeller: true,
-    },
-    {
-        id: 5,
-        title: "Nike Aiforce Shoes",
-        category: "Men-Shoes",
-        price: 230,
-        oldPrice: 630,
-        rating: 4.8,
-        reviews: 20,
-        image: TempImage,
-        bestSeller: true,
-    },
-];
+import DefaultImage from '../../../assets/images/default-image.webp';
+import { message } from "antd";
+import { addToCart } from "../../../services/basket";
 function BestSeller() {
     const selectedStore = useSelector(getAllStoreDetails) || [];
     const settings = {
@@ -75,6 +32,7 @@ function BestSeller() {
                     }
                 );
                 if (res?.data?.data.data) {
+                    console.log(res.data.data.data, "asdnaskjdn");
                     setProducts(res.data.data.data);
                 } else {
                     setProducts([]);
@@ -88,7 +46,7 @@ function BestSeller() {
     useEffect(() => {
         fetchProducts();
     }, []);
-
+console.log(products,"asjldnasld")
 
     return (
         <>
@@ -103,9 +61,9 @@ function BestSeller() {
                     <div className="row">
                         <div className="col-md-12">
                             <div className="best-slider-sim d-flex flex-wrap gap-4">
-                                {bestSellers.map((product) => (
-                                    <div key={product.id} className="prod-wrap">
-                                        <ProductCard {...product} />
+                                {products.map((product) => (
+                                    <div key={product.id} className="prod-wrap" style={{ width: '23%' }}>
+                                        <ProductCard product={product} />
                                     </div>
                                 ))}
                             </div>
@@ -119,32 +77,57 @@ function BestSeller() {
 
 export default BestSeller
 
-const ProductCard = ({ title,
-    category,
-    price,
-    oldPrice,
-    rating,
-    reviews,
-    image,
-    bestSeller, }) => {
+const ProductCard = ({ product }) => {
+    const handleAddToCart = async (e) => {
+        e.preventDefault();
+        try {
+            const payload = {
+                items: [
+                    {
+                        product_id: product._id,
+                        quantity: 1,
+                    },
+                ],
+                store_name: product.product_store,
+            };
+            const res = await addToCart(payload);
+            if (res.data.success) {
+                message.success("Item Adeed to cart.");
+
+            } else {
+                message.error("Something went wrong");
+            }
+        } catch (err) {
+            message.error("Something wend wrong");
+        }
+    };
+
     return (
         <div className="prod_item">
             <div className="prod_thumb">
-                {bestSeller && <span className="best_seller">Best Seller</span>}
+                {/* {bestSeller && <span className="best_seller">Best Seller</span>} */}
                 <span className="wishlist"><i className="fa fa-heart"></i></span>
-                <img className="prod_img" src={image} alt={title} />
+                <img
+                    className="prod_img"
+                    src={product?.product_image || DefaultImage}
+                    alt={product?.product_name || "Product"}
+                    onError={(e) => {
+                        e.currentTarget.src = DefaultImage; // fallback
+                        e.currentTarget.onerror = null;     // prevent infinite loop
+                    }}
+                />
             </div>
-            <div className="prod_txt">
-                <a href="#" className="prod_title">{title}</a>
-                <span className="prod_cat">{category}</span>
-                <div className="prod-star">
+            <div className="prod_txt mt-3">
+                <a href="#" className="prod_title">{product.product_name}</a>
+                {/* <span className="prod_cat">{category}</span> */}
+                <div className="prod-star mt-3">
                     {[...Array(5)].map((_, i) => (
                         <i key={i} className="fa fa-star"></i>
                     ))}
-                    <span>{rating} ({reviews} reviews)</span>
+                    <span>0  reviews</span>
                 </div>
-                <h5>${price.toFixed(2)} <ins>${oldPrice.toFixed(2)}</ins></h5>
-                <a href="#" className="btn btn-orange add_to_cart">Add to Cart</a>
+                {/* <h5>${price.toFixed(2)} <ins>${oldPrice.toFixed(2)}</ins></h5> */}
+                <a onClick={handleAddToCart} className="btn btn-green mt-3">Add to Cart</a>
             </div>
         </div>
     );

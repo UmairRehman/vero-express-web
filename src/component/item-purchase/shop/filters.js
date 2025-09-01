@@ -59,6 +59,7 @@ export default function SidebarFilter() {
     const updateParams = () => {
         const params = new URLSearchParams();
         params.set("store_name", searchParams.get("store_name") || "");
+        params.set("store_id", searchParams.get("store_id") || "");
         if (selectedCategory) params.set("parent_id", selectedCategory);
         if (selectedPrice) params.set("price", selectedPrice);
         if (customPrice.low) params.set("low", customPrice.low);

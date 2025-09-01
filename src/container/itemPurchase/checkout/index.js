@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../../../component/header'
 import Breadcrumb from '../../../component/item-purchase/breadcrumbs'
 import SubHeader from '../../../component/shared/subHeader'
@@ -8,9 +8,51 @@ import Newsletter from '../../../component/shared/subscribe'
 import FaqSection from '../../../component/shared/faq'
 import Footer from '../../../component/footer'
 import CheckoutSteps from '../../../component/item-purchase/checkout/step'
-import CheckoutPricing from '../../../component/item-purchase/checkout/checkout-pricing'
+import { message } from 'antd'
+import { getCart } from '../../../services/basket'
+import CartSummaryMain from '../../../component/item-purchase/cart/cart-summary'
 
 function Checkout() {
+
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [cartItems, setCartItems] = useState([]);
+
+    const fetchCartItems = async () => {
+        try {
+            setLoading(true);
+            const response = await getCart();
+            if (response.data && response.data.data.basket) {
+                const basket = response.data.data.basket;
+                const processedItems = basket.items.map(item => {
+                    return {
+                        id: item.product_id._id,
+                        _id: item.product_id._id,
+                        category: item.product_id.category,
+                        title: item.product_id.product_name,
+                        image: item.product_id.product_image,
+                        price: item.product_id.product_price,
+                        originalPrice: item.product_id.product_price,
+                        quantity: item.quantity || 1,
+                    };
+                });
+                setCartItems(processedItems);
+            } else {
+                message.error("No basket data found");
+                setCartItems([]);
+            }
+        } catch (error) {
+            setError('Failed to load cart items');
+            message.error("Failed to load cart items");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCartItems();
+    }, []);
+
     return (
         <>
             <Header />
@@ -20,10 +62,10 @@ function Checkout() {
                 <div class="container">
                     <div class="row row-checkout">
                         <div className='col-md-8'>
-                            <CheckoutSteps />
+                            <CheckoutSteps cartItems={cartItems} setCartItems={setCartItems} />
                         </div>
                         <div className='col-md-4'>
-                            <CheckoutPricing subtotal={100} delivery={10} itemCount={3} discount={10} />
+                            <CartSummaryMain cartItems={cartItems} />
                         </div>
                     </div>
                 </div>

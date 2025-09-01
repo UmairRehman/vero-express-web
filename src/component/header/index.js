@@ -4,6 +4,8 @@ import cartIcon from '../../assets/images/cart-ico.png';
 import { useNavigate } from "react-router-dom";
 import { Avatar, Button, Dropdown, Space } from 'antd';
 import { getUserDetails, Logout } from '../../redux/feature/authSlice';
+import { resetStores } from '../../redux/feature/stores';
+import { resetLoader } from '../../redux/feature/loader';
 import { useDispatch, useSelector } from 'react-redux';
 import { DownOutlined, UserOutlined } from '@ant-design/icons';
 
@@ -13,8 +15,17 @@ const Header = () => {
   const dispatch = useDispatch();
 
   const onClickLogout = () => {
+    // Clear localStorage
     localStorage.removeItem("authorization");
+    localStorage.removeItem("api_key");
+    
+    // Reset all Redux stores
     dispatch(Logout());
+    dispatch(resetStores());
+    dispatch(resetLoader());
+    
+    // Navigate to home page
+    navigate("/");
   }
 
   const items = [

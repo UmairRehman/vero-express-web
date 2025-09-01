@@ -27,8 +27,7 @@ import { Authenticate } from "../../../redux/feature/authSlice";
 import { getSelectedStoreDetails } from "../../../redux/feature/stores";
 import AddCardForm from "./addCardForm";
 
-const CheckoutSteps = () => {
-    const [cartItems, setCartItems] = useState([]);
+const CheckoutSteps = ({cartItems, setCartItems}) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeStep, setActiveStep] = useState("shipping");
@@ -207,15 +206,14 @@ const CheckoutSteps = () => {
             if (response.data && response.data.data.basket) {
                 const basket = response.data.data.basket;
                 const processedItems = basket.items.map(item => {
-                    // Use API data with static fallbacks for missing values
                     return {
-                        id: item._id || `item_${Date.now()}`,
-                        category: item.category || "General",
-                        title: item.title || "Product",
-                        image: item.image || TempImage,
-                        price: item.price || 25.0,
-                        originalPrice: item.originalPrice || 35.0,
-                        stock: item.stock || "In Stock",
+                        id: item.product_id._id,
+                        _id: item.product_id._id,
+                        category: item.product_id.category,
+                        title: item.product_id.product_name,
+                        image: item.product_id.product_image,
+                        price: item.product_id.product_price,
+                        originalPrice: item.product_id.product_price,
                         quantity: item.quantity || 1,
                     };
                 });

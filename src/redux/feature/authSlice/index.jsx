@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { resetStores } from "../stores";
+import { resetLoader } from "../loader";
 
 const initialState = {
   login: false,
@@ -30,6 +32,8 @@ const userSlice = createSlice({
       state.login = false;
       state.token = "";
       state.user = null;
+      state.permissions = [];
+      state.masterUser = false;
     },
     updateUserAddresses: (state, action) => {
       if (state.user) {

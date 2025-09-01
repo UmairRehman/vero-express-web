@@ -15,10 +15,14 @@ const shops = createSlice({
         setAllStores: (state, payload) => {
             state.allStores = payload.payload;
         },
+        resetStores: (state) => {
+            state.selectedStore = {};
+            state.allStores = [];
+        },
     },
 });
 
-export const { setSelectedStore, setAllStores } = shops.actions;
+export const { setSelectedStore, setAllStores, resetStores } = shops.actions;
 export const getSelectedStoreDetails = (state) => state.store;
 export const getAllStoreDetails = (state) => state.store.allStores;
 
