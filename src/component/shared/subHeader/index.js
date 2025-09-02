@@ -13,7 +13,7 @@ function SubHeader() {
                             <ul>
                                 <li><a onClick={() => navigate("/item-purchase")}>Purchase Items</a></li>
                                 <li><a onClick={() => navigate("/parcel-delivery")}>Parcel Delivery</a></li>
-                                <li><a >Return / Exchange Items</a></li>
+                                <li><a onClick={() => navigate("/parcel-delivery")} >Return / Exchange Items</a></li>
                             </ul>
                         </nav>
                     </div>
