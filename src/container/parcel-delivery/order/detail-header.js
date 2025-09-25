@@ -21,14 +21,14 @@ const steps = [
         subtitle: 'Delivery Method',
         image: Step2Image,
         bgImage: Step2Image2,
-    },
-    {
-        key: 'success',
-        title: 'Payment',
-        subtitle: 'Payment method',
-        image: Step3Image,
-        bgImage: Step3Image2,
-    },
+    }
+    // {
+    //     key: 'success',
+    //     title: 'Payment',
+    //     subtitle: 'Payment method',
+    //     image: Step3Image,
+    //     bgImage: Step3Image2,
+    // },
 ];
 
 const DetailHeader = ({ handleClick, activeStep }) => {

@@ -15,7 +15,7 @@ function ParcelStep1({ onSubmit = () => {} }) {
             items: [
                 {
                     receipt_image: values.receipt_image || "",
-                    item_image: values.item_image || ""
+                    item_image: values.receipt_image || ""
                 }
             ],
             selectType: values.selectType,
@@ -25,9 +25,6 @@ function ParcelStep1({ onSubmit = () => {} }) {
             deliveryPreference: values.deliveryPreference
         };
         
-        console.log('Form submission data:', formData);
-        console.log('Receipt Image URL:', formData.items[0].receipt_image);
-        console.log('Item Image URL:', formData.items[0].item_image);
         message.success('Form submitted successfully!');
         
         // Call the onSubmit prop to navigate to step 2
@@ -102,7 +99,6 @@ function ParcelStep1({ onSubmit = () => {} }) {
                          form.setFieldsValue({
                              receipt_image: uploadedUrls[0] || ''
                          });
-                         console.log('Set receipt_image to:', uploadedUrls[0]);
                      }
                      if (uploadedUrls.length > 1) {
                          form.setFieldsValue({
@@ -233,8 +229,8 @@ function ParcelStep1({ onSubmit = () => {} }) {
                             ]}
                         >
                             <Select placeholder="Select type">
-                                <Option value="itemReturn">Item Return</Option>
-                                <Option value="itemExchange">Item Exchange</Option>
+                                <Option value="item_return">Item Return</Option>
+                                <Option value="item_exchange">Item Exchange</Option>
                             </Select>
                         </Form.Item>
                     </Col>
